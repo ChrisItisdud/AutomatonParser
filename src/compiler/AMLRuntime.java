@@ -19,7 +19,7 @@ public class AMLRuntime {
 		}
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
-		if (automaton.getType() == models.AutomatonType.NFA || automaton.getType() == models.AutomatonType.NPDA)
+		if (automaton.getType() != models.AutomatonType.DFA)
 			throw new exception.AMLRuntimeException();
 		if (this.curr == null)
 			this.curr = automaton.getStart()[0];
@@ -34,12 +34,13 @@ public class AMLRuntime {
 
 	public models.IState[] chooseNonDeterministic() {
 		// TODO: use less hacky solution than exception
-		if (automaton.getType() == models.AutomatonType.DFA || automaton.getType() == models.AutomatonType.DPDA)
+		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
 		if (word.length() <= wordIndex) {
 			if (automaton.getType() == models.AutomatonType.NFA)
 				throw new exception.AMLRuntimeFinishedException(curr.isEndState());
-			else throw new exception.AMLRuntimeFinishedException(curr.isEndState() || pdaStack.pop()==null);
+			else
+				throw new exception.AMLRuntimeFinishedException(curr.isEndState() || pdaStack.pop() == null);
 		}
 		Character input = word.charAt(wordIndex);
 		if (this.curr == null)
@@ -48,6 +49,8 @@ public class AMLRuntime {
 	}
 
 	public models.RuntimeResponse stepNonDeterministic(models.IState newState) {
+		if (automaton.getType() != models.AutomatonType.NFA)
+			throw new exception.AMLRuntimeException();
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
 		if (arrayContains(curr.transition(input), newState)) {

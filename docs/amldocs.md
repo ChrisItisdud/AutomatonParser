@@ -3,6 +3,7 @@
 AML is the language used to describe deterministic and non-deterministic finite automata (DFA/NFA) as well as pushdown automata/PDAs (NPDA/DPDA).
 An AML program is divided into three sections: The *INFO*, *STATES* and *TRANSITIONS* section.
 Each automaton starts out with its type and name info in the *INFO* section, followed by a set of states it contains as well as its start and end states in the *STATES* section, then the transitions between states are defined in the *TRANSITIONS* section.
+Note that while the following examples will include comments marked with //, the language does not yet support comments.
 
 ## The INFO section
 

@@ -38,9 +38,9 @@ public class AMLRuntime {
 			throw new exception.AMLRuntimeException();
 		if (word.length() <= wordIndex) {
 			if (automaton.getType() == models.AutomatonType.NFA)
-				throw new exception.AMLRuntimeFinishedException(curr.isEndState());
+				throw new exception.AMLRuntimeFinishedException(curr.isEndState(), curr);
 			else
-				throw new exception.AMLRuntimeFinishedException(curr.isEndState() || pdaStack.pop() == null);
+				throw new exception.AMLRuntimeFinishedException(curr.isEndState() || pdaStack.pop() == null, curr);
 		}
 		Character input = word.charAt(wordIndex);
 		if (this.curr == null)
@@ -53,7 +53,7 @@ public class AMLRuntime {
 			throw new exception.AMLRuntimeException();
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
-		if (arrayContains(curr.transition(input), newState)) {
+		if ((this.curr == null && arrayContains(automaton.getStart(), newState)) || (this.curr != null && arrayContains(curr.transition(input), newState))) {
 			this.curr = newState;
 			return new models.RuntimeResponse(curr, input, false, false);
 		} else
@@ -66,5 +66,8 @@ public class AMLRuntime {
 				return true;
 		}
 		return false;
+	}
+	public models.IState getCurr(){
+		return curr;
 	}
 }

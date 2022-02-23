@@ -1,0 +1,12 @@
+SECTION INFO
+name: simple-regex-nfa
+type: NFA
+SECTION STATES
+states: s1, s2
+start: s1
+fin: s2
+SECTION TRANSITIONS
+s1, a, s1
+s1, b, s1
+s1, b, s2
+s2, c, s2

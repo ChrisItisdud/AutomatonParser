@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import models.AutomatonType;
-
+//TODO: Skip empty lines, ignore comments
 public class AMLCompiler {
 
 	public static models.Automaton parse(String fname) {

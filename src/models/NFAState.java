@@ -16,7 +16,11 @@ public class NFAState implements IState {
 	@Override
 	public IState[] transition(Character input) {
 		if(transitions.containsKey(input)) {
-			return (IState[]) transitions.get(input).toArray();
+			IState[] transArray = new IState[transitions.get(input).size()];
+			for(int i=0;i<transArray.length;i++) {
+				transArray[i]=transitions.get(input).get(i);
+			}
+			return transArray;
 		}
 		else return null;
 	}

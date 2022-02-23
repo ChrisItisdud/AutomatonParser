@@ -1,0 +1,11 @@
+SECTION INFO
+name: simple-regex-dfa
+type: DFA
+SECTION STATES
+states: s1, s2
+start: s1
+fin: s2
+SECTION TRANSITIONS
+s1, a, s1
+s1, b, s2
+s2, b, s2

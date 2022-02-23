@@ -39,5 +39,9 @@ public class NFAState implements IState {
 	public boolean isEndState() {
 		return endState;
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 }

@@ -1,6 +1,6 @@
 # AUTOMATON MARKUP LANGUAGE (AML) SYNTAX
 
-AML is the language used to describe deterministic and non-deterministic finite automata (DFA/NFA) as well as PDAs (NPDA/DPDA).
+AML is the language used to describe deterministic and non-deterministic finite automata (DFA/NFA) as well as pushdown automata/PDAs (NPDA/DPDA).
 An AML program is divided into three sections: The *INFO*, *STATES* and *TRANSITIONS* section.
 Each automaton starts out with its type and name info in the *INFO* section, followed by a set of states it contains as well as its start and end states in the *STATES* section, then the transitions between states are defined in the *TRANSITIONS* section.
 
@@ -51,6 +51,6 @@ s1, #, a, s1, A#
 s1, A, b, s2, BB#
 ```
 
-*Note that  at the start of the program, the stack will consist of a single #. You can only read one character from the stack per transition, but are allowed to push multiple characters to the stack. A PDA is allowed to end without reaching an end state if the stack is empty.*
+*Note that  at the start of the program, the stack will consist of a single #. You can only read one character from the stack per transition, but are allowed to push multiple characters to the stack. A NPDA is allowed to end as soon as its stack is empty, while a DPDA is only allowed to end on an end state independently of the stack*
 
 For both NFAs and NPDAs, the # character carries special significance as it allows for transitioning to a different state without reading a character. This is disabled for DFAs and DPDAs as it can lead to non-deterministic behaviour.

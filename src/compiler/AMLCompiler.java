@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import models.AutomatonType;
+
 //TODO: Skip empty lines, ignore comments
 public class AMLCompiler {
 
@@ -113,8 +114,12 @@ public class AMLCompiler {
 				line = br.readLine();
 				while (line != null) {
 					String[] transString = line.split(", ");
-					if(transString.length!=3) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
-					if(transString[1].length()!=1) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH);
+					if (transString.length != 3)
+						throw new exception.AMLIllegalSyntaxException(
+								exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+					if (transString[1].length() != 1)
+						throw new exception.AMLIllegalSyntaxException(
+								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH);
 					if (!states.containsKey(transString[0]) || !states.containsKey(transString[2]))
 						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
 					switch (type) {
@@ -140,7 +145,7 @@ public class AMLCompiler {
 				}
 				return new models.Automaton(starts, name, type);
 			} else {
-				//TODO: Implement compiler logic for DPDAs and NPDAs				
+				// TODO: Implement compiler logic for DPDAs and NPDAs
 				// start section states
 				line = br.readLine();
 				if (!line.equals("SECTION STATES"))
@@ -195,11 +200,13 @@ public class AMLCompiler {
 					throw new exception.AMLIllegalSyntaxException(
 							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
 				String[] endsString = line.substring(5).split(", ");
-				for (String s : endsString) {
-					if (!states.containsKey(s))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
-					states.get(s).setEndState(true);
-				}
+				if (!(endsString.length == 1 && endsString[0].equals("") && type == AutomatonType.NPDA))
+					for (String s : endsString) {
+						if (!states.containsKey(s))
+							throw new exception.AMLIllegalSyntaxException(
+									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+						states.get(s).setEndState(true);
+					}
 				// start section transitions
 				line = br.readLine();
 				if (!line.equals("SECTION TRANSITIONS"))
@@ -210,19 +217,25 @@ public class AMLCompiler {
 				line = br.readLine();
 				while (line != null) {
 					String[] transString = line.split(", ");
-					if(transString.length!=5) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
-					if(transString[1].length()!=1 || transString[2].length()!=1) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH);
+					if (transString.length != 5)
+						throw new exception.AMLIllegalSyntaxException(
+								exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+					if (transString[1].length() != 1 || transString[2].length() != 1)
+						throw new exception.AMLIllegalSyntaxException(
+								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH);
 					if (!states.containsKey(transString[0]) || !states.containsKey(transString[3]))
 						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
 					switch (type) {
 					case DPDA:
 						models.DPDAState state = (models.DPDAState) states.get(transString[0]);
 						Character[] stackTarget = toCharacterArray(transString[4]);
-						state.addTransition(transString[2].charAt(0), transString[1].charAt(0), states.get(transString[3]), stackTarget);
+						state.addTransition(transString[2].charAt(0), transString[1].charAt(0),
+								states.get(transString[3]), stackTarget);
 						break;
 					case NPDA:
 						models.NPDAState nfastate = (models.NPDAState) states.get(transString[0]);
-						nfastate.addTransition(transString[2].charAt(0), transString[1].charAt(0), states.get(transString[2]), toCharacterArray(transString[4]));
+						nfastate.addTransition(transString[2].charAt(0), transString[1].charAt(0),
+								states.get(transString[3]), toCharacterArray(transString[4]));
 						break;
 					default:
 						break;
@@ -243,12 +256,13 @@ public class AMLCompiler {
 			throw new RuntimeException("Something went wrong while reading the file");
 		}
 	}
-	
+
 	public static Character[] toCharacterArray(String s) {
-		if (s.equals("-")) return new Character[0];
+		if (s.equals("-"))
+			return new Character[0];
 		Character[] array = new Character[s.length()];
-		for(int i=0;i<array.length;i++) {
-			array[i]=s.charAt(i);
+		for (int i = 0; i < array.length; i++) {
+			array[i] = s.charAt(i);
 		}
 		return array;
 	}

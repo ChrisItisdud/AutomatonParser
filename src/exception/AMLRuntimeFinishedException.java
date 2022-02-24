@@ -5,13 +5,26 @@ public class AMLRuntimeFinishedException extends RuntimeException {
 	boolean isWord;
 	Character letter;
 	models.IState state;
+	models.IPDAState pdaState;
 	public AMLRuntimeFinishedException(boolean isWord, Character letter, models.IState state) {
 		this.isWord = isWord;
 		this.letter = letter;
 		this.state = state;
 	}
+	
+	public AMLRuntimeFinishedException(boolean isWord, Character letter, models.IPDAState state) {
+		this.isWord = isWord;
+		this.letter = letter;
+		this.pdaState = state;
+	}
 
 	public AMLRuntimeFinishedException(boolean isWord, models.IState state) {
+		this.state = state;
+		this.isWord = isWord;
+	}
+	
+	public AMLRuntimeFinishedException(boolean isWord, models.IPDAState state) {
+		this.pdaState = state;
 		this.isWord = isWord;
 	}
 	
@@ -23,5 +36,8 @@ public class AMLRuntimeFinishedException extends RuntimeException {
 	}
 	public models.IState getState() {
 		return state;
+	}
+	public models.IPDAState getPdaState() {
+		return pdaState;
 	}
 }

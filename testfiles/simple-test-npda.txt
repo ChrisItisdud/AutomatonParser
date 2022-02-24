@@ -1,0 +1,15 @@
+SECTION INFO
+name: twice-or-once
+type: NPDA
+SECTION STATES
+states: s1, s2, s3, s4
+start: s1
+fin: 
+SECTION TRANSITIONS
+s1, #, a, s1, A
+s1, A, a, s1, AA
+s1, A, c, s2, A
+s1, A, c, s3, A
+s2, A, b, s2, -
+s3, A, b, s4, A
+s4, A, b, s3, -

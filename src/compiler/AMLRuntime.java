@@ -67,10 +67,7 @@ public class AMLRuntime {
 		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
 		if (word.length() <= wordIndex) {
-			if (automaton.getType() == models.AutomatonType.NFA)
-				throw new exception.AMLRuntimeFinishedException(curr.isEndState(), curr);
-			else
-				throw new exception.AMLRuntimeFinishedException(curr.isEndState() || pdaStack.pop() == null, curr);
+			throw new exception.AMLRuntimeFinishedException(curr.isEndState(), curr);
 		}
 		Character input = word.charAt(wordIndex);
 		if (this.curr == null)
@@ -78,17 +75,62 @@ public class AMLRuntime {
 		return curr.transition(input);
 	}
 
+	public models.IPDAState[] chooseNPDA() {
+		if (automaton.getType() != models.AutomatonType.NPDA)
+			throw new exception.AMLRuntimeException();
+		if (word.length() <= wordIndex) {
+			throw new exception.AMLRuntimeFinishedException(pdaCurr.isEndState() || pdaStack.pop() == null, pdaCurr);
+		}
+		Character input = word.charAt(wordIndex);
+		if (this.pdaCurr == null) {
+			return automaton.getPdaStart();
+		}
+		Character stack = pdaStack.pop();
+		pdaStack.push(stack);
+		models.PDATransition[] transitions = pdaCurr.transition(input, stack);
+		if (transitions == null)
+			return null;
+		return getStatesFromTransitions(transitions);
+	}
+
 	public models.RuntimeResponse stepNonDeterministic(models.IState newState) {
 		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
+		if (this.curr == null && arrayContains(automaton.getStart(), newState)){
+			this.curr = newState;
+			return new models.RuntimeResponse(curr, '#', false, false);
+		}
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
-		if ((this.curr == null && arrayContains(automaton.getStart(), newState))
-				|| (this.curr != null && arrayContains(curr.transition(input), newState))) {
+		if(this.curr != null && arrayContains(curr.transition(input), newState)) {
 			this.curr = newState;
 			return new models.RuntimeResponse(curr, input, false, false);
 		} else
 			throw new exception.AMLRuntimeException();
+	}
+
+	public models.RuntimeResponse stepNPDA(models.IPDAState newState) {
+		if (automaton.getType() != models.AutomatonType.NPDA)
+			throw new exception.AMLRuntimeException();
+		if ((this.pdaCurr == null && arrayContains(automaton.getPdaStart(), newState))) {
+			this.pdaCurr = newState;
+			return new models.RuntimeResponse(pdaCurr, '#', false, false);
+		}
+		Character input = word.charAt(wordIndex);
+		wordIndex++;
+		Character stack = pdaStack.pop();
+		if (this.pdaCurr != null
+				&& arrayContains(getStatesFromTransitions(pdaCurr.transition(input, stack)), newState)) {
+			models.PDATransition[] transitions = pdaCurr.transition(input, stack);
+			for (models.PDATransition t : transitions) {
+				if (t.getTarget() == newState) {
+					pdaStack.push(t.getStackTarget());
+					this.pdaCurr = newState;
+					return new models.RuntimeResponse(pdaCurr, input, false, false);
+				}
+			}
+		}
+		throw new exception.AMLRuntimeException();
 	}
 
 	private static <T> boolean arrayContains(T[] array, T object) {
@@ -102,8 +144,20 @@ public class AMLRuntime {
 	public models.IState getCurr() {
 		return curr;
 	}
-	
-	public models.Stack<Character> getStack(){
+
+	public models.IPDAState getPdaCurr() {
+		return pdaCurr;
+	}
+
+	public models.Stack<Character> getStack() {
 		return pdaStack;
+	}
+
+	private static models.IPDAState[] getStatesFromTransitions(models.PDATransition[] transitions) {
+		models.IPDAState[] state = new models.IPDAState[transitions.length];
+		for (int i = 0; i < transitions.length; i++) {
+			state[i] = transitions[i].getTarget();
+		}
+		return state;
 	}
 }

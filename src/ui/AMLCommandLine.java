@@ -24,6 +24,7 @@ public class AMLCommandLine {
 				try {
 					automaton = AMLCompiler.parse(command.split(" ")[1]);
 				} catch (exception.AMLIllegalSyntaxException e) {
+					e.printStackTrace();
 					System.out.println("Syntax error!");
 				} catch (Exception e) {
 					System.out.println(
@@ -106,21 +107,74 @@ public class AMLCommandLine {
 						}
 					}
 					// LOGIC FOR DPDAS
-					//TODO: Also output stack state
 					else if (automaton.getType() == models.AutomatonType.DPDA) {
 						// Step through word
 						models.RuntimeResponse state = null;
 						do {
 							state = runtime.stepDeterministic();
 							List<Character> stack = runtime.getStack().output();
-							System.out.print(
-									"Read: " + state.getChar() + ", Now entering state " + state.getPdaState().getName()+". Stack: ");
-							for(Character c : stack) {
+							System.out.print("Read: " + state.getChar() + ", Now entering state "
+									+ state.getPdaState().getName() + ". Stack: ");
+							for (Character c : stack) {
 								System.out.print(c);
 							}
 							System.out.println();
 							scanner.nextLine();
 						} while (!state.isFinished());
+						// output result
+						if (!state.isWord() && state.getChar() == null) {
+							System.out.println("Failure: Word ended on non-final state " + state.getPdaState().getName()
+									+ ". Word is not part of language.");
+						} else if (state.getChar() != null) {
+							System.out.println("Failure: State " + state.getPdaState().getName()
+									+ " doesn't accept letter " + state.getChar() + ". Word is not part of language.");
+						} else {
+							System.out.println("The given word " + command.substring(6) + " is part of language!");
+						}
+					}
+					// LOGIC FOR NPDAS
+					else {
+						models.RuntimeResponse state = null;
+						try {
+							do {
+								// Check options for next state
+								models.IPDAState[] options = runtime.chooseNPDA();
+								if (options == null) { // ==failure
+									state = new models.RuntimeResponse(runtime.getPdaCurr(), '#', true, false);
+								} else if (options.length == 1) { // ==deterministic clear path
+									state = runtime.stepNPDA(options[0]);
+								} else { // ==non-deterministic - let user decide
+									System.out.println("Please choose the most appropriate option:");
+									int i = 0;
+									for (models.IPDAState s : options) {
+										System.out.println(i + ": " + s.getName());
+										i++;
+									}
+									int index = -1;
+									do {
+										index = -1;
+										try {
+											index = scanner.nextInt();
+											scanner.nextLine();
+										} catch (Exception e) {
+											System.out.println("Invalid number, please enter valid number!");
+										}
+									} while (index == -1 || index >= options.length);
+									state = runtime.stepNPDA(options[index]);
+								}
+								List<Character> stack = runtime.getStack().output();
+								System.out.println("Read: " + state.getChar() + ", Now entering state "
+										+ state.getPdaState().getName() + ". Stack: ");
+								for (Character c : stack) {
+									System.out.print(c);
+								}
+								System.out.println();
+								scanner.nextLine();
+							} while (!state.isFinished());
+							// finish via exception - hacky solution but works
+						} catch (exception.AMLRuntimeFinishedException e) {
+							state = new RuntimeResponse(e.getPdaState(), e.getLetter(), true, e.isWord());
+						}
 						// output result
 						if (!state.isWord() && state.getChar() == null) {
 							System.out.println("Failure: Word ended on non-final state " + state.getPdaState().getName()

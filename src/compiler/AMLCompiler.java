@@ -8,7 +8,8 @@ import java.util.HashMap;
 import models.AutomatonType;
 
 public class AMLCompiler {
-
+	//TODO: Implement '#' as empty field functionality for NFAs and NPDAs
+	//TODO: Implement proper exception messages
 	public static models.Automaton parse(String fname) {
 		try (AMLReader br = new AMLReader(new FileReader(fname))) {
 			// Start section info

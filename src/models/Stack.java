@@ -1,5 +1,7 @@
 package models;
 
+import java.util.ArrayList;
+
 class Node<T> {
 	T value;
 	Node<T> next;
@@ -25,5 +27,14 @@ public class Stack<T> {
 			top = top.next;
 			return value;
 		}
+	}
+	public ArrayList<T> output() {
+		Node<T> temp = top;
+		ArrayList<T> result = new ArrayList<>();
+		while (temp!=null) {
+			result.add(temp.value);
+			temp = temp.next;
+		}
+		return result;
 	}
 }

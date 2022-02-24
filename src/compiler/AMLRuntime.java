@@ -102,4 +102,8 @@ public class AMLRuntime {
 	public models.IState getCurr() {
 		return curr;
 	}
+	
+	public models.Stack<Character> getStack(){
+		return pdaStack;
+	}
 }

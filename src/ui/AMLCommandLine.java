@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.List;
 import java.util.Scanner;
 
 import compiler.AMLCompiler;
@@ -111,8 +112,13 @@ public class AMLCommandLine {
 						models.RuntimeResponse state = null;
 						do {
 							state = runtime.stepDeterministic();
-							System.out.println(
-									"Read: " + state.getChar() + ", Now entering state " + state.getPdaState().getName());
+							List<Character> stack = runtime.getStack().output();
+							System.out.print(
+									"Read: " + state.getChar() + ", Now entering state " + state.getPdaState().getName()+". Stack: ");
+							for(Character c : stack) {
+								System.out.print(c);
+							}
+							System.out.println();
 							scanner.nextLine();
 						} while (!state.isFinished());
 						// output result

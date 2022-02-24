@@ -50,8 +50,9 @@ For DPDAs and NPDAs, you need to additionally specify the characters read from a
 SECTION TRANSITIONS
 s1, #, a, s1, A#
 s1, A, b, s2, BB#
+s2, B, b, s2, -	//- will push nothing to the stack
 ```
 
-*Note that  at the start of the program, the stack will consist of a single #. You can only read one character from the stack per transition, but are allowed to push multiple characters to the stack. A NPDA is allowed to end as soon as its stack is empty, while a DPDA is only allowed to end on an end state independently of the stack*
+*Note that  at the start of the program, the stack will consist of a single #. You can only read one character from the stack per transition, but are allowed to push multiple characters to the stack, the first letter being the new top of the stack. A NPDA is allowed to end as soon as its stack is empty, while a DPDA is only allowed to end on an end state independently of the stack*
 
 For both NFAs and NPDAs, the # character carries special significance as it allows for transitioning to a different state without reading a character. This is disabled for DFAs and DPDAs as it can lead to non-deterministic behaviour.

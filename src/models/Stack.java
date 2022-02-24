@@ -13,6 +13,11 @@ public class Stack<T> {
 	public void push(T t) {
 		top = new Node<T>(t, top);
 	}
+	public void push(T[] t) {
+		for(int i=t.length-1;i>=0;i--) {
+			top = new Node<T>(t[i], top);
+		}
+	}
 	public T pop() {
 		if(top == null) return null;
 		else {

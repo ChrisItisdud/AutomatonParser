@@ -2,6 +2,7 @@ package compiler;
 
 public class AMLRuntime {
 	private models.IState curr;
+	private models.IPDAState pdaCurr;
 	private models.Automaton automaton;
 	private String word;
 	private int wordIndex = 0;
@@ -15,21 +16,50 @@ public class AMLRuntime {
 
 	public models.RuntimeResponse stepDeterministic() {
 		if (wordIndex >= word.length()) {
-			return new models.RuntimeResponse(curr, null, true, curr.isEndState());
+			switch (automaton.getType()) {
+			case DFA:
+				return new models.RuntimeResponse(curr, null, true, curr.isEndState());
+			case DPDA:
+				return new models.RuntimeResponse(pdaCurr, null, true, pdaCurr.isEndState());
+			default:
+				throw new exception.AMLRuntimeException();
+			}
 		}
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
-		if (automaton.getType() != models.AutomatonType.DFA)
+		switch (automaton.getType()) {
+		case DFA:
+			return stepDFA(input);
+		case DPDA:
+			return stepDPDA(input);
+		default:
 			throw new exception.AMLRuntimeException();
+		}
+	}
+
+	private models.RuntimeResponse stepDFA(Character input) {
 		if (this.curr == null)
 			this.curr = automaton.getStart()[0];
 		else {
 			models.IState[] transitions = this.curr.transition(input);
-			if (transitions == null && automaton.getType() == models.AutomatonType.DFA)
+			if (transitions == null)
 				return new models.RuntimeResponse(curr, input, true, false);
 			curr = transitions[0];
 		}
 		return new models.RuntimeResponse(curr, input, false, false);
+	}
+
+	public models.RuntimeResponse stepDPDA(Character input) {
+		if (this.pdaCurr == null)
+			this.pdaCurr = automaton.getPdaStart()[0];
+		else {
+			models.PDATransition[] transitions = this.pdaCurr.transition(input, pdaStack.pop());
+			if (transitions == null)
+				return new models.RuntimeResponse(pdaCurr, input, true, false);
+			pdaCurr = transitions[0].getTarget();
+			pdaStack.push(transitions[0].getStackTarget());
+		}
+		return new models.RuntimeResponse(pdaCurr, input, false, false);
 	}
 
 	public models.IState[] chooseNonDeterministic() {
@@ -53,7 +83,8 @@ public class AMLRuntime {
 			throw new exception.AMLRuntimeException();
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
-		if ((this.curr == null && arrayContains(automaton.getStart(), newState)) || (this.curr != null && arrayContains(curr.transition(input), newState))) {
+		if ((this.curr == null && arrayContains(automaton.getStart(), newState))
+				|| (this.curr != null && arrayContains(curr.transition(input), newState))) {
 			this.curr = newState;
 			return new models.RuntimeResponse(curr, input, false, false);
 		} else
@@ -67,7 +98,8 @@ public class AMLRuntime {
 		}
 		return false;
 	}
-	public models.IState getCurr(){
+
+	public models.IState getCurr() {
 		return curr;
 	}
 }

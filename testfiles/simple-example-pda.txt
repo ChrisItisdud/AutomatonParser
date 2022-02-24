@@ -1,0 +1,13 @@
+SECTION INFO
+name: as-and-bs
+type: DPDA
+SECTION STATES
+states: s1, s2, s3
+start: s1
+fin: s3
+SECTION TRANSITIONS
+s1, #, a, s1, A#
+s1, A, a, s1, AA
+s1, A, b, s2, -
+s2, A, b, s2, -
+s2, #, b, s3, -

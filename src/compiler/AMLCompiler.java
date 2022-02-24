@@ -239,11 +239,13 @@ public class AMLCompiler {
 				return new models.Automaton(starts, name, type);
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new RuntimeException("Something went wrong while reading the file");
 		}
 	}
 	
 	public static Character[] toCharacterArray(String s) {
+		if (s.equals("-")) return new Character[0];
 		Character[] array = new Character[s.length()];
 		for(int i=0;i<array.length;i++) {
 			array[i]=s.charAt(i);

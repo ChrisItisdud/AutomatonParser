@@ -27,6 +27,7 @@ public class AMLCommandLine {
 					e.printStackTrace();
 					System.out.println("Syntax error!");
 				} catch (Exception e) {
+					e.printStackTrace();
 					System.out.println(
 							"Something went wrong while reading the file. Please check filename spelling and try again.");
 				}

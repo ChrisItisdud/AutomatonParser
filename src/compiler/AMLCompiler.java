@@ -1,6 +1,5 @@
 package compiler;
 
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,11 +7,10 @@ import java.util.HashMap;
 
 import models.AutomatonType;
 
-//TODO: Skip empty lines, ignore comments
 public class AMLCompiler {
 
 	public static models.Automaton parse(String fname) {
-		try (BufferedReader br = new BufferedReader(new FileReader(fname))) {
+		try (AMLReader br = new AMLReader(new FileReader(fname))) {
 			// Start section info
 			String line = br.readLine();
 			if (!line.equals("SECTION INFO"))

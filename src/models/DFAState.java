@@ -19,8 +19,8 @@ public class DFAState implements IState {
 		return null;
 	}
 
-	public void addTransition(Character key, IState iState) {
-		if (transitions.containsKey(key)) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS);
+	public void addTransition(Character key, IState iState, int line) {
+		if (transitions.containsKey(key)) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS, line);
 		transitions.put(key, (DFAState)iState);
 	}
 	

@@ -1,0 +1,5 @@
+SECTION INFO
+name: cool-name
+type: NFA
+SECTION STATES
+d

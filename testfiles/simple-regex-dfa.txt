@@ -1,11 +1,11 @@
 SECTION INFO	//this is a test for inline comments
 //this is a test for comments on their own line 	
-	name: simple-regex-dfa
- type: DFA
+name: simple-regex-dfa
+type: DFA
 SECTION STATES
 states: s1, s2
 start: s1
-fin: s2
+end: s2
 
 SECTION TRANSITIONS
 s1, a, s1

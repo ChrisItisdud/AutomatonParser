@@ -34,7 +34,7 @@ public class NPDAState implements IPDAState {
 	}
 
 	@Override
-	public void addTransition(Character key, Character stackKey, IPDAState target, Character[] stackTarget) {
+	public void addTransition(Character key, Character stackKey, IPDAState target, Character[] stackTarget, int line) {
 		if(values.containsKey(key)&&values.get(key).containsKey(stackKey)) {
 			PDATransition[] transitions = values.get(key).get(stackKey);
 			PDATransition[] newTransitions = Arrays.copyOf(transitions, transitions.length+1);

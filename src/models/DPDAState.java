@@ -33,8 +33,8 @@ public class DPDAState implements IPDAState {
 	}
 
 	@Override
-	public void addTransition(Character key, Character stackKey, IPDAState target, Character[] stackTarget) {
-		if(values.containsKey(key)&&values.get(key).containsKey(stackKey)) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS);
+	public void addTransition(Character key, Character stackKey, IPDAState target, Character[] stackTarget, int line) {
+		if(values.containsKey(key)&&values.get(key).containsKey(stackKey)) throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS, line);
 		else if(!values.containsKey(key)) {
 			values.put(key, new HashMap<>());
 			values.get(key).put(stackKey, new PDATransition[] {new PDATransition(target, stackTarget)});

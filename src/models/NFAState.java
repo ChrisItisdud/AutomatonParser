@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NFAState implements IState {
+public class NFAState implements IFAState {
 	Map<Character, List<IState>> transitions = new HashMap<>();
 	boolean endState = false;
 	String name;
@@ -25,7 +25,7 @@ public class NFAState implements IState {
 		else return null;
 	}
 	
-	public void addTransition(Character key, IState value) {
+	public void addTransition(Character key, IState value, int line) {
 		if(transitions.containsKey(key)) {
 			transitions.get(key).add(value);
 		}

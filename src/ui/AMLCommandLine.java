@@ -24,8 +24,7 @@ public class AMLCommandLine {
 				try {
 					automaton = AMLCompiler.parse(command.split(" ")[1]);
 				} catch (exception.AMLIllegalSyntaxException e) {
-					e.printStackTrace();
-					System.out.println("Syntax error!");
+					System.out.println("Syntax Error: Error "+e.getType()+" in line "+e.getLine()+".");
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println(

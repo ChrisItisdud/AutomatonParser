@@ -5,5 +5,5 @@ public interface IPDAState {
 	public boolean isEndState();
 	public void setEndState(boolean input);
 	public String getName();
-	public void addTransition(Character key, Character stackKey, IPDAState target, Character[] stackTarget);
+	public void addTransition(Character key, Character stackKey, IPDAState target, Character[] stackTarget, int line);
 }

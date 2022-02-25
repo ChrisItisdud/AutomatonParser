@@ -10,21 +10,21 @@ import models.AutomatonType;
 public class AMLCompiler {
 	//TODO: Implement '#' as empty field functionality for NFAs and NPDAs
 	//TODO: Implement proper exception messages
-	public static models.Automaton parse(String fname) {
+	public static models.Automaton parse(String fname) throws IOException {
 		try (AMLReader br = new AMLReader(new FileReader(fname))) {
 			// Start section info
 			String line = br.readLine();
 			if (!line.equals("SECTION INFO"))
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_SECTION_START_MISSING);
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_SECTION_INFO_MISSING, br.getLineCount());
 			// grab automaton name
 			line = br.readLine();
 			if (!line.startsWith("name: "))
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 			String name = line.substring(6);
 			// grab automaton type
 			line = br.readLine();
 			if (!line.startsWith("type: "))
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 			String typeString = line.substring(6);
 			AutomatonType type = null;
 			switch (typeString) {
@@ -41,26 +41,26 @@ public class AMLCompiler {
 				type = AutomatonType.DPDA;
 				break;
 			default:
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_TYPE);
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_TYPE, br.getLineCount());
 			}
 			if (type == AutomatonType.NFA || type == AutomatonType.DFA) {
 				// start section states
 				line = br.readLine();
 				if (!line.equals("SECTION STATES"))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_SECTION_STATES_MISSING);
+							exception.AMLSyntaxExceptions.ERR_SECTION_STATES_MISSING, br.getLineCount());
 				// grab states
 				// TODO: Check for duplicate state names
 				line = br.readLine();
 				if (!line.startsWith("states: "))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 				String[] statesString = line.substring(8).split(", ");
 				HashMap<String, models.IState> states = new HashMap<>();
 				for (String s : statesString) {
 					if (states.containsKey(s))
 						throw new exception.AMLIllegalSyntaxException(
-								exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS);
+								exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS, br.getLineCount());
 					switch (type) {
 					case DFA:
 						states.put(s, new models.DFAState(s));
@@ -77,37 +77,37 @@ public class AMLCompiler {
 				ArrayList<models.IState> startStates = new ArrayList<>();
 				if (!line.startsWith("start: "))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 				if (type == AutomatonType.NFA) {
 					String[] startsString = line.substring(7).split(", ");
 					for (String s : startsString) {
 						if (!states.containsKey(s))
 							throw new exception.AMLIllegalSyntaxException(
-									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 						startStates.add(states.get(s));
 					}
 				} else {
 					String startsString = line.substring(7);
 					if (!states.containsKey(startsString))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 					startStates.add(states.get(startsString));
 				}
 				// grab end states
 				line = br.readLine();
-				if (!line.startsWith("fin: "))
+				if (!line.startsWith("end: "))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 				String[] endsString = line.substring(5).split(", ");
 				for (String s : endsString) {
 					if (!states.containsKey(s))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 					states.get(s).setEndState(true);
 				}
 				// start section transitions
 				line = br.readLine();
 				if (!line.equals("SECTION TRANSITIONS"))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_SECTION_TRANSITIONS_MISSING);
+							exception.AMLSyntaxExceptions.ERR_SECTION_TRANSITIONS_MISSING, br.getLineCount());
 				// TODO: validate transitions before parsing
 				// parse transitions
 				line = br.readLine();
@@ -115,20 +115,20 @@ public class AMLCompiler {
 					String[] transString = line.split(", ");
 					if (transString.length != 3)
 						throw new exception.AMLIllegalSyntaxException(
-								exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+								exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 					if (transString[1].length() != 1)
 						throw new exception.AMLIllegalSyntaxException(
-								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH);
+								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH, br.getLineCount());
 					if (!states.containsKey(transString[0]) || !states.containsKey(transString[2]))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 					switch (type) {
 					case DFA:
 						models.DFAState state = (models.DFAState) states.get(transString[0]);
-						state.addTransition(transString[1].charAt(0), states.get(transString[2]));
+						state.addTransition(transString[1].charAt(0), states.get(transString[2]), br.getLineCount());
 						break;
 					case NFA:
 						models.NFAState nfastate = (models.NFAState) states.get(transString[0]);
-						nfastate.addTransition(transString[1].charAt(0), states.get(transString[2]));
+						nfastate.addTransition(transString[1].charAt(0), states.get(transString[2]), br.getLineCount());
 						break;
 					default:
 						break;
@@ -149,19 +149,19 @@ public class AMLCompiler {
 				line = br.readLine();
 				if (!line.equals("SECTION STATES"))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_SECTION_STATES_MISSING);
+							exception.AMLSyntaxExceptions.ERR_SECTION_STATES_MISSING, br.getLineCount());
 				// grab states
 				// TODO: Check for duplicate state names
 				line = br.readLine();
 				if (!line.startsWith("states: "))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 				String[] statesString = line.substring(8).split(", ");
 				HashMap<String, models.IPDAState> states = new HashMap<>();
 				for (String s : statesString) {
 					if (states.containsKey(s))
 						throw new exception.AMLIllegalSyntaxException(
-								exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS);
+								exception.AMLSyntaxExceptions.ERR_KEY_ALREADY_EXISTS, br.getLineCount());
 					switch (type) {
 					case DPDA:
 						states.put(s, new models.DPDAState(s));
@@ -178,39 +178,39 @@ public class AMLCompiler {
 				ArrayList<models.IPDAState> startStates = new ArrayList<>();
 				if (!line.startsWith("start: "))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 				if (type == AutomatonType.NPDA) {
 					String[] startsString = line.substring(7).split(", ");
 					for (String s : startsString) {
 						if (!states.containsKey(s))
 							throw new exception.AMLIllegalSyntaxException(
-									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 						startStates.add(states.get(s));
 					}
 				} else {
 					String startsString = line.substring(7);
 					if (!states.containsKey(startsString))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 					startStates.add(states.get(startsString));
 				}
 				// grab end states
 				line = br.readLine();
 				if (!line.startsWith("fin: "))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 				String[] endsString = line.substring(5).split(", ");
 				if (!(endsString.length == 1 && endsString[0].equals("") && type == AutomatonType.NPDA))
 					for (String s : endsString) {
 						if (!states.containsKey(s))
 							throw new exception.AMLIllegalSyntaxException(
-									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 						states.get(s).setEndState(true);
 					}
 				// start section transitions
 				line = br.readLine();
 				if (!line.equals("SECTION TRANSITIONS"))
 					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_SECTION_TRANSITIONS_MISSING);
+							exception.AMLSyntaxExceptions.ERR_SECTION_TRANSITIONS_MISSING, br.getLineCount());
 				// TODO: validate transitions before parsing
 				// parse transitions
 				line = br.readLine();
@@ -218,23 +218,23 @@ public class AMLCompiler {
 					String[] transString = line.split(", ");
 					if (transString.length != 5)
 						throw new exception.AMLIllegalSyntaxException(
-								exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER);
+								exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
 					if (transString[1].length() != 1 || transString[2].length() != 1)
 						throw new exception.AMLIllegalSyntaxException(
-								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH);
+								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH, br.getLineCount());
 					if (!states.containsKey(transString[0]) || !states.containsKey(transString[3]))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE);
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
 					switch (type) {
 					case DPDA:
 						models.DPDAState state = (models.DPDAState) states.get(transString[0]);
 						Character[] stackTarget = toCharacterArray(transString[4]);
 						state.addTransition(transString[2].charAt(0), transString[1].charAt(0),
-								states.get(transString[3]), stackTarget);
+								states.get(transString[3]), stackTarget, br.getLineCount());
 						break;
 					case NPDA:
 						models.NPDAState nfastate = (models.NPDAState) states.get(transString[0]);
 						nfastate.addTransition(transString[2].charAt(0), transString[1].charAt(0),
-								states.get(transString[3]), toCharacterArray(transString[4]));
+								states.get(transString[3]), toCharacterArray(transString[4]), br.getLineCount());
 						break;
 					default:
 						break;
@@ -251,8 +251,7 @@ public class AMLCompiler {
 				return new models.Automaton(starts, name, type);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Something went wrong while reading the file");
+			throw e;
 		}
 	}
 

@@ -8,23 +8,26 @@ import java.util.HashMap;
 import models.AutomatonType;
 
 public class AMLCompiler {
-	//TODO: Implement '#' as empty field functionality for NFAs and NPDAs
-	//TODO: Implement proper exception messages
+	// TODO: Implement '#' as empty field functionality for NFAs and NPDAs
+	// TODO: Implement proper exception messages
 	public static models.Automaton parse(String fname) throws IOException {
 		try (AMLReader br = new AMLReader(new FileReader(fname))) {
 			// Start section info
 			String line = br.readLine();
 			if (!line.equals("SECTION INFO"))
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_SECTION_INFO_MISSING, br.getLineCount());
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_SECTION_INFO_MISSING,
+						br.getLineCount());
 			// grab automaton name
 			line = br.readLine();
 			if (!line.startsWith("name: "))
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER,
+						br.getLineCount());
 			String name = line.substring(6);
 			// grab automaton type
 			line = br.readLine();
 			if (!line.startsWith("type: "))
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER,
+						br.getLineCount());
 			String typeString = line.substring(6);
 			AutomatonType type = null;
 			switch (typeString) {
@@ -41,7 +44,8 @@ public class AMLCompiler {
 				type = AutomatonType.DPDA;
 				break;
 			default:
-				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_TYPE, br.getLineCount());
+				throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_TYPE,
+						br.getLineCount());
 			}
 			if (type == AutomatonType.NFA || type == AutomatonType.DFA) {
 				// start section states
@@ -89,7 +93,8 @@ public class AMLCompiler {
 				} else {
 					String startsString = line.substring(7);
 					if (!states.containsKey(startsString))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE,
+								br.getLineCount());
 					startStates.add(states.get(startsString));
 				}
 				// grab end states
@@ -100,7 +105,8 @@ public class AMLCompiler {
 				String[] endsString = line.substring(5).split(", ");
 				for (String s : endsString) {
 					if (!states.containsKey(s))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE,
+								br.getLineCount());
 					states.get(s).setEndState(true);
 				}
 				// start section transitions
@@ -120,7 +126,8 @@ public class AMLCompiler {
 						throw new exception.AMLIllegalSyntaxException(
 								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH, br.getLineCount());
 					if (!states.containsKey(transString[0]) || !states.containsKey(transString[2]))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE,
+								br.getLineCount());
 					switch (type) {
 					case DFA:
 						models.DFAState state = (models.DFAState) states.get(transString[0]);
@@ -190,22 +197,25 @@ public class AMLCompiler {
 				} else {
 					String startsString = line.substring(7);
 					if (!states.containsKey(startsString))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE,
+								br.getLineCount());
 					startStates.add(states.get(startsString));
 				}
 				// grab end states
 				line = br.readLine();
-				if (!line.startsWith("fin: "))
-					throw new exception.AMLIllegalSyntaxException(
-							exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
-				String[] endsString = line.substring(5).split(", ");
-				if (!(endsString.length == 1 && endsString[0].equals("") && type == AutomatonType.NPDA))
-					for (String s : endsString) {
-						if (!states.containsKey(s))
-							throw new exception.AMLIllegalSyntaxException(
-									exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
-						states.get(s).setEndState(true);
-					}
+				if (!(line.equals("end:") && type == AutomatonType.NPDA)) {
+					if (!line.startsWith("end: "))
+						throw new exception.AMLIllegalSyntaxException(
+								exception.AMLSyntaxExceptions.ERR_UNEXPECTED_IDENTIFIER, br.getLineCount());
+					String[] endsString = line.substring(5).split(", ");
+					if (!(endsString.length == 1 && endsString[0].equals("") && type == AutomatonType.NPDA))
+						for (String s : endsString) {
+							if (!states.containsKey(s))
+								throw new exception.AMLIllegalSyntaxException(
+										exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
+							states.get(s).setEndState(true);
+						}
+				}
 				// start section transitions
 				line = br.readLine();
 				if (!line.equals("SECTION TRANSITIONS"))
@@ -223,7 +233,8 @@ public class AMLCompiler {
 						throw new exception.AMLIllegalSyntaxException(
 								exception.AMLSyntaxExceptions.ERR_ILLEGAL_KEY_LENGTH, br.getLineCount());
 					if (!states.containsKey(transString[0]) || !states.containsKey(transString[3]))
-						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE, br.getLineCount());
+						throw new exception.AMLIllegalSyntaxException(exception.AMLSyntaxExceptions.ERR_UNKNOWN_STATE,
+								br.getLineCount());
 					switch (type) {
 					case DPDA:
 						models.DPDAState state = (models.DPDAState) states.get(transString[0]);

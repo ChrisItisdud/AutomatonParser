@@ -1,26 +1,18 @@
 package models;
 
-public class RuntimeResponse {
-	IState state;
-	IPDAState pdaState;
+public class RuntimeResponse<T> {
+	T state;
 	Character readChar;
 	boolean isFinished = false;
 	boolean isWord;
 
-	public RuntimeResponse(IState state, Character readChar) {
+	public RuntimeResponse(T state, Character readChar) {
 		this.state = state;
 		this.readChar = readChar;
 	}
 
-	public RuntimeResponse(IState state, Character readChar, boolean isFinished, boolean isWord) {
+	public RuntimeResponse(T state, Character readChar, boolean isFinished, boolean isWord) {
 		this.state = state;
-		this.readChar = readChar;
-		this.isFinished = isFinished;
-		this.isWord = isWord;
-	}
-
-	public RuntimeResponse(IPDAState state, Character readChar, boolean isFinished, boolean isWord) {
-		this.pdaState = state;
 		this.readChar = readChar;
 		this.isFinished = isFinished;
 		this.isWord = isWord;
@@ -30,12 +22,8 @@ public class RuntimeResponse {
 		return readChar;
 	}
 
-	public IState getState() {
+	public T getState() {
 		return state;
-	}
-
-	public IPDAState getPdaState() {
-		return pdaState;
 	}
 
 	public boolean isWord() {

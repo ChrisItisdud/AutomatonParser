@@ -1,5 +1,7 @@
 package compiler;
 
+import models.RuntimeResponse;
+
 public class AMLRuntime {
 	private models.IState curr;
 	private models.IPDAState pdaCurr;
@@ -18,9 +20,9 @@ public class AMLRuntime {
 		if (wordIndex >= word.length()) {
 			switch (automaton.getType()) {
 			case DFA:
-				return new models.RuntimeResponse(curr, null, true, curr.isEndState());
+				return new models.RuntimeResponse<models.IState>(curr, null, true, curr.isEndState());
 			case DPDA:
-				return new models.RuntimeResponse(pdaCurr, null, true, pdaCurr.isEndState());
+				return new models.RuntimeResponse<models.IPDAState>(pdaCurr, null, true, pdaCurr.isEndState());
 			default:
 				throw new exception.AMLRuntimeException();
 			}
@@ -37,84 +39,84 @@ public class AMLRuntime {
 		}
 	}
 
-	private models.RuntimeResponse stepDFA(Character input) {
+	private models.RuntimeResponse<models.IState> stepDFA(Character input) {
 		if (this.curr == null)
 			this.curr = automaton.getStart()[0];
 		else {
 			models.IState[] transitions = this.curr.transition(input);
 			if (transitions == null)
-				return new models.RuntimeResponse(curr, input, true, false);
+				return new models.RuntimeResponse<>(curr, input, true, false);
 			curr = transitions[0];
 		}
-		return new models.RuntimeResponse(curr, input, false, false);
+		return new models.RuntimeResponse<>(curr, input, false, false);
 	}
 
-	private models.RuntimeResponse stepDPDA(Character input) {
+	private models.RuntimeResponse<models.IPDAState> stepDPDA(Character input) {
 		if (this.pdaCurr == null)
 			this.pdaCurr = automaton.getPdaStart()[0];
 		else {
 			models.PDATransition[] transitions = this.pdaCurr.transition(input, pdaStack.pop());
 			if (transitions == null)
-				return new models.RuntimeResponse(pdaCurr, input, true, false);
+				return new models.RuntimeResponse<>(pdaCurr, input, true, false);
 			pdaCurr = transitions[0].getTarget();
 			pdaStack.push(transitions[0].getStackTarget());
 		}
-		return new models.RuntimeResponse(pdaCurr, input, false, false);
+		return new models.RuntimeResponse<>(pdaCurr, input, false, false);
 	}
 
-	public models.IState[] chooseNonDeterministic() {
+	public models.RuntimeResponse<models.StateChoice<models.IState>>chooseNonDeterministic() {
 		// TODO: use less hacky solution than exception
 		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
 		if (word.length() <= wordIndex) {
-			throw new exception.AMLRuntimeFinishedException(curr.isEndState(), curr);
+			return new models.RuntimeResponse<models.StateChoice<models.IState>>(null, word.charAt(wordIndex), true, curr.isEndState());
 		}
 		Character input = word.charAt(wordIndex);
 		if (this.curr == null)
-			return automaton.getStart();
-		return curr.transition(input);
+			return new models.RuntimeResponse<models.StateChoice<models.IState>>(new models.StateChoice<>(automaton.getStart()), input, false, false);
+		return new models.RuntimeResponse<models.StateChoice<models.IState>>(new models.StateChoice<>(curr.transition(input)), input, false, false);
 	}
 
-	public models.IPDAState[] chooseNPDA() {
+	public models.RuntimeResponse<models.StateChoice<models.IPDAState>>chooseNPDA() {
 		if (automaton.getType() != models.AutomatonType.NPDA)
 			throw new exception.AMLRuntimeException();
 		if (word.length() <= wordIndex) {
-			throw new exception.AMLRuntimeFinishedException(pdaCurr.isEndState() || pdaStack.pop() == null, pdaCurr);
+			return new models.RuntimeResponse<models.StateChoice<models.IPDAState>>(new models.StateChoice<>(null), '#', true, (pdaCurr.isEndState() || pdaStack.pop()==null));
 		}
 		Character input = word.charAt(wordIndex);
 		if (this.pdaCurr == null) {
-			return automaton.getPdaStart();
+			return new models.RuntimeResponse<models.StateChoice<models.IPDAState>>(new models.StateChoice<>(automaton.getPdaStart()), '#', false, false);
 		}
 		Character stack = pdaStack.pop();
 		pdaStack.push(stack);
 		models.PDATransition[] transitions = pdaCurr.transition(input, stack);
 		if (transitions == null)
-			return null;
-		return getStatesFromTransitions(transitions);
+			return new models.RuntimeResponse<models.StateChoice<models.IPDAState>>(new models.StateChoice<>(null), word.charAt(wordIndex), false, false);
+		return new models.RuntimeResponse<models.StateChoice<models.IPDAState>>(new models.StateChoice<>(getStatesFromTransitions(transitions)), word.charAt(wordIndex), false, false);
 	}
 
-	public models.RuntimeResponse stepNonDeterministic(models.IState newState) {
+	public models.RuntimeResponse<models.IState> stepNonDeterministic(models.IState newState) {
 		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
 		if (this.curr == null && arrayContains(automaton.getStart(), newState)){
 			this.curr = newState;
-			return new models.RuntimeResponse(curr, '#', false, false);
+			return new models.RuntimeResponse<>(curr, '#', false, false);
 		}
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
 		if(this.curr != null && arrayContains(curr.transition(input), newState)) {
 			this.curr = newState;
-			return new models.RuntimeResponse(curr, input, false, false);
+			return new models.RuntimeResponse<>(curr, input, false, false);
 		} else
 			throw new exception.AMLRuntimeException();
 	}
 
-	public models.RuntimeResponse stepNPDA(models.IPDAState newState) {
+	public models.RuntimeResponse<models.IPDAState> stepNPDA(models.IPDAState newState) {
 		if (automaton.getType() != models.AutomatonType.NPDA)
 			throw new exception.AMLRuntimeException();
 		if ((this.pdaCurr == null && arrayContains(automaton.getPdaStart(), newState))) {
 			this.pdaCurr = newState;
-			return new models.RuntimeResponse(pdaCurr, '#', false, false);
+			return new models.RuntimeResponse<>(pdaCurr, '#', false, false);
 		}
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
@@ -126,7 +128,7 @@ public class AMLRuntime {
 				if (t.getTarget() == newState) {
 					pdaStack.push(t.getStackTarget());
 					this.pdaCurr = newState;
-					return new models.RuntimeResponse(pdaCurr, input, false, false);
+					return new models.RuntimeResponse<>(pdaCurr, input, false, false);
 				}
 			}
 		}

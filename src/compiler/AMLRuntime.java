@@ -49,7 +49,7 @@ public class AMLRuntime {
 		return new models.RuntimeResponse(curr, input, false, false);
 	}
 
-	public models.RuntimeResponse stepDPDA(Character input) {
+	private models.RuntimeResponse stepDPDA(Character input) {
 		if (this.pdaCurr == null)
 			this.pdaCurr = automaton.getPdaStart()[0];
 		else {

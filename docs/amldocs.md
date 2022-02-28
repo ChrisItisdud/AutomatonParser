@@ -27,10 +27,10 @@ The *STATES* section will look the same for basically every program:
 SECTION STATES
 states: s1, s2 //,...
 start: s1
-fin: s2
+end: s2
 ```
 
-Firstly all the possible states are defined under "states", then the "start" and "fin" fields specify which states your program starts and ends with. Note that only NFAs and NPDAs can have more than one starting state, while DFAs and PDAs always start with the same initial state, as having multiple starting states is non-deterministic behaviour. All automata support having more than one final state, but only NPDAs support having no finishing states, as they can end based on the stack instead.
+Firstly all the possible states are defined under "states", then the "start" and "end" fields specify which states your program starts and ends with. Note that only NFAs and NPDAs can have more than one starting state, while DFAs and PDAs always start with the same initial state, as having multiple starting states is non-deterministic behaviour. All automata support having more than one final state, but only NPDAs support having no finishing states, as they can end based on the stack instead.
 
 ### The TRANSITIONS section
 

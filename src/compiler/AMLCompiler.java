@@ -255,7 +255,7 @@ public class AMLCompiler {
 		}
 	}
 
-	public static Character[] toCharacterArray(String s) {
+	private static Character[] toCharacterArray(String s) {
 		if (s.equals("-"))
 			return new Character[0];
 		Character[] array = new Character[s.length()];

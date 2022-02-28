@@ -6,12 +6,12 @@ import java.io.IOException;
 
 public class AMLReader extends BufferedReader {
 	private int lineCount;
-	public AMLReader(FileReader f) {
+	AMLReader(FileReader f) {
 		super(f);
 		lineCount = 0;
 	}
 	
-	public int getLineCount() {
+	int getLineCount() {
 		return lineCount;
 	}
 

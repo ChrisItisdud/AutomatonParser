@@ -25,10 +25,13 @@ public class AMLCommandLine {
 					automaton = AMLCompiler.parse(command.split(" ")[1]);
 				} catch (exception.AMLIllegalSyntaxException e) {
 					System.out.println("Syntax Error: Error " + e.getType() + " in line " + e.getLine() + ".");
+					continue;
 				} catch (Exception e) {
 					System.out.println(
 							"Something went wrong while reading the file. Please check filename spelling and try again.");
+					continue;
 				}
+				System.out.println("Successfully parsed "+command.split(" ")[1]);
 			}
 			// "check" command
 			else if (command.startsWith("check")) {

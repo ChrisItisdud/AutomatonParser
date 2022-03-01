@@ -74,7 +74,7 @@ public class AMLCommandLine {
 								state = runtime.stepNFA(optArr[0]);
 							} else { // ==non-deterministic - let user decide
 								System.out.println("Please choose the most appropriate option for the character "
-										+ state.getChar() + " and the remaining word " + state.getWord() + ":");
+										+ options.getChar() + " and the remaining word " + options.getWord() + ":");
 								int i = 0;
 								for (models.IState s : optArr) {
 									System.out.println(i + ": " + s.getName());
@@ -152,7 +152,7 @@ public class AMLCommandLine {
 								state = runtime.stepNPDA(optArr[0]);
 							} else { // ==non-deterministic - let user decide
 								System.out.println("Please choose the most appropriate option for the character "
-										+ state.getChar() + " and the remaining word " + state.getWord() + ":");
+										+ options.getChar() + " and the remaining word " + options.getWord() + ":");
 								int i = 0;
 								for (models.IPDAState s : optArr) {
 									System.out.println(i + ": " + s.getName());

@@ -48,14 +48,13 @@ public class AMLRuntime {
 		}
 		return new models.RuntimeResponse<>(pdaCurr, input, false, false, word.substring(wordIndex));
 	}
-	
-	//TODO: return correct character
+
 	public models.RuntimeResponse<models.StateChoice<models.IState>> chooseNFA() {
 		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
 		if (word.length() <= wordIndex) {
-			return new models.RuntimeResponse<models.StateChoice<models.IState>>(new models.StateChoice<>(null), '#', true,
-					curr.isEndState(), word);
+			return new models.RuntimeResponse<models.StateChoice<models.IState>>(new models.StateChoice<>(null), '#',
+					true, curr.isEndState(), word);
 		}
 		Character input = word.charAt(wordIndex);
 		if (this.curr == null)

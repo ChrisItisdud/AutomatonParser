@@ -1,7 +1,5 @@
 package compiler;
 
-import models.RuntimeResponse;
-
 public class AMLRuntime {
 	private models.IState curr;
 	private models.IPDAState pdaCurr;
@@ -16,30 +14,12 @@ public class AMLRuntime {
 		pdaStack.push('#');
 	}
 
-	public models.RuntimeResponse stepDeterministic() {
-		if (wordIndex >= word.length()) {
-			switch (automaton.getType()) {
-			case DFA:
+	public models.RuntimeResponse<models.IState> stepDFA() {
+		if(wordIndex >= word.length()) {
 				return new models.RuntimeResponse<models.IState>(curr, null, true, curr.isEndState());
-			case DPDA:
-				return new models.RuntimeResponse<models.IPDAState>(pdaCurr, null, true, pdaCurr.isEndState());
-			default:
-				throw new exception.AMLRuntimeException();
-			}
 		}
 		Character input = word.charAt(wordIndex);
 		wordIndex++;
-		switch (automaton.getType()) {
-		case DFA:
-			return stepDFA(input);
-		case DPDA:
-			return stepDPDA(input);
-		default:
-			throw new exception.AMLRuntimeException();
-		}
-	}
-
-	private models.RuntimeResponse<models.IState> stepDFA(Character input) {
 		if (this.curr == null)
 			this.curr = automaton.getStart()[0];
 		else {
@@ -51,7 +31,12 @@ public class AMLRuntime {
 		return new models.RuntimeResponse<>(curr, input, false, false);
 	}
 
-	private models.RuntimeResponse<models.IPDAState> stepDPDA(Character input) {
+	public models.RuntimeResponse<models.IPDAState> stepDPDA() {
+		if(wordIndex >= word.length()) {
+				return new models.RuntimeResponse<models.IPDAState>(pdaCurr, null, true, pdaCurr.isEndState());
+		}
+		Character input = word.charAt(wordIndex);
+		wordIndex++;
 		if (this.pdaCurr == null)
 			this.pdaCurr = automaton.getPdaStart()[0];
 		else {

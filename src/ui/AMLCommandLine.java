@@ -44,7 +44,7 @@ public class AMLCommandLine {
 						// Step through word
 						models.RuntimeResponse<models.IState> state = null;
 						do {
-							state = runtime.stepDeterministic();
+							state = runtime.stepDFA();
 							System.out.println(
 									"Read: " + state.getChar() + ", Now entering state " + state.getState().getName());
 							scanner.nextLine();
@@ -113,7 +113,7 @@ public class AMLCommandLine {
 						// Step through word
 						models.RuntimeResponse<models.IPDAState> state = null;
 						do {
-							state = runtime.stepDeterministic();
+							state = runtime.stepDPDA();
 							List<Character> stack = runtime.getStack().output();
 							System.out.print("Read: " + state.getChar() + ", Now entering state "
 									+ state.getState().getName() + ". Stack: ");

@@ -49,7 +49,7 @@ public class AMLRuntime {
 		return new models.RuntimeResponse<>(pdaCurr, input, false, false);
 	}
 
-	public models.RuntimeResponse<models.StateChoice<models.IState>>chooseNonDeterministic() {
+	public models.RuntimeResponse<models.StateChoice<models.IState>>chooseNFA() {
 		// TODO: use less hacky solution than exception
 		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
@@ -80,7 +80,7 @@ public class AMLRuntime {
 		return new models.RuntimeResponse<models.StateChoice<models.IPDAState>>(new models.StateChoice<>(getStatesFromTransitions(transitions)), word.charAt(wordIndex), false, false);
 	}
 
-	public models.RuntimeResponse<models.IState> stepNonDeterministic(models.IState newState) {
+	public models.RuntimeResponse<models.IState> stepNFA(models.IState newState) {
 		if (automaton.getType() != models.AutomatonType.NFA)
 			throw new exception.AMLRuntimeException();
 		if (this.curr == null && arrayContains(automaton.getStart(), newState)){

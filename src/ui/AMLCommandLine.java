@@ -65,7 +65,7 @@ public class AMLCommandLine {
 						models.RuntimeResponse<models.StateChoice<models.IState>> options = null;
 						do {
 							// Check options for next state
-							options = runtime.chooseNonDeterministic();
+							options = runtime.chooseNFA();
 							models.IState[] optArr = options.getState().getValues();
 							if (options.isFinished()) {
 								state = new models.RuntimeResponse<models.IState>(runtime.getCurr(), '#', true,
@@ -73,7 +73,7 @@ public class AMLCommandLine {
 							} else if (optArr == null) { // ==failure
 								state = new models.RuntimeResponse<>(runtime.getCurr(), '#', true, false);
 							} else if (optArr.length == 1) { // ==deterministic clear path
-								state = runtime.stepNonDeterministic(optArr[0]);
+								state = runtime.stepNFA(optArr[0]);
 							} else { // ==non-deterministic - let user decide
 								System.out.println("Please choose the most appropriate option:");
 								int i = 0;
@@ -91,7 +91,7 @@ public class AMLCommandLine {
 										System.out.println("Invalid number, please enter valid number!");
 									}
 								} while (index == -1 || index >= optArr.length);
-								state = runtime.stepNonDeterministic(optArr[index]);
+								state = runtime.stepNFA(optArr[index]);
 							}
 							System.out.println(
 									"Read: " + state.getChar() + ", Now entering state " + state.getState().getName());

@@ -3,9 +3,6 @@ package ui;
 import java.util.List;
 import java.util.Scanner;
 
-import compiler.AMLCompiler;
-import models.RuntimeResponse;
-
 //Test command line client.
 public class AMLCommandLine {
 	public static void main(String[] args) {
@@ -22,7 +19,7 @@ public class AMLCommandLine {
 			// "parse" command
 			else if (command.startsWith("parse")) {
 				try {
-					automaton = AMLCompiler.parse(command.split(" ")[1]);
+					automaton = compiler.AMLCompiler.parse(command.split(" ")[1]);
 				} catch (exception.AMLIllegalSyntaxException e) {
 					System.out.println("Syntax Error: Error " + e.getType() + " in line " + e.getLine() + ".");
 					continue;
@@ -31,7 +28,7 @@ public class AMLCommandLine {
 							"Something went wrong while reading the file. Please check filename spelling and try again.");
 					continue;
 				}
-				System.out.println("Successfully parsed "+command.split(" ")[1]);
+				System.out.println("Successfully parsed " + command.split(" ")[1]);
 			}
 			// "check" command
 			else if (command.startsWith("check")) {
@@ -45,8 +42,8 @@ public class AMLCommandLine {
 						models.RuntimeResponse<models.IState> state = null;
 						do {
 							state = runtime.stepDFA();
-							System.out.println(
-									"Read: " + state.getChar() + ", Now entering state " + state.getState().getName());
+							System.out.println("Read: " + state.getChar() + ", Now entering state "
+									+ state.getState().getName() + ". Remaining word: " + state.getWord());
 							scanner.nextLine();
 						} while (!state.isFinished());
 						// output result
@@ -69,13 +66,15 @@ public class AMLCommandLine {
 							models.IState[] optArr = options.getState().getValues();
 							if (options.isFinished()) {
 								state = new models.RuntimeResponse<models.IState>(runtime.getCurr(), '#', true,
-										options.isWord());
+										options.isWord(), command.substring(6));
 							} else if (optArr == null) { // ==failure
-								state = new models.RuntimeResponse<>(runtime.getCurr(), '#', true, false);
+								state = new models.RuntimeResponse<>(runtime.getCurr(), '#', true, false,
+										command.substring(6));
 							} else if (optArr.length == 1) { // ==deterministic clear path
 								state = runtime.stepNFA(optArr[0]);
 							} else { // ==non-deterministic - let user decide
-								System.out.println("Please choose the most appropriate option:");
+								System.out.println("Please choose the most appropriate option for the character "
+										+ state.getChar() + " and the remaining word " + state.getWord() + ":");
 								int i = 0;
 								for (models.IState s : optArr) {
 									System.out.println(i + ": " + s.getName());
@@ -93,8 +92,8 @@ public class AMLCommandLine {
 								} while (index == -1 || index >= optArr.length);
 								state = runtime.stepNFA(optArr[index]);
 							}
-							System.out.println(
-									"Read: " + state.getChar() + ", Now entering state " + state.getState().getName());
+							System.out.println("Read: " + state.getChar() + ", Now entering state "
+									+ state.getState().getName() + ". Remaining word: " + state.getWord());
 							scanner.nextLine();
 						} while (!state.isFinished());
 						// output result
@@ -116,7 +115,7 @@ public class AMLCommandLine {
 							state = runtime.stepDPDA();
 							List<Character> stack = runtime.getStack().output();
 							System.out.print("Read: " + state.getChar() + ", Now entering state "
-									+ state.getState().getName() + ". Stack: ");
+									+ state.getState().getName() + ". Remaining word:" + state.getWord() + ". Stack: ");
 							for (Character c : stack) {
 								System.out.print(c);
 							}
@@ -143,15 +142,17 @@ public class AMLCommandLine {
 							options = runtime.chooseNPDA();
 							models.IPDAState[] optArr = options.getState().getValues();
 							if (options.isFinished()) {
-								state = new models.RuntimeResponse<>(runtime.getPdaCurr(), '#', true,
-										options.isWord());
+								state = new models.RuntimeResponse<>(runtime.getPdaCurr(), '#', true, options.isWord(),
+										command.substring(6));
 								break;
 							} else if (optArr == null) { // ==failure
-								state = new models.RuntimeResponse<>(runtime.getPdaCurr(), '#', true, false);
+								state = new models.RuntimeResponse<>(runtime.getPdaCurr(), '#', true, false,
+										command.substring(6));
 							} else if (optArr.length == 1) { // ==deterministic clear path
 								state = runtime.stepNPDA(optArr[0]);
 							} else { // ==non-deterministic - let user decide
-								System.out.println("Please choose the most appropriate option:");
+								System.out.println("Please choose the most appropriate option for the character "
+										+ state.getChar() + " and the remaining word " + state.getWord() + ":");
 								int i = 0;
 								for (models.IPDAState s : optArr) {
 									System.out.println(i + ": " + s.getName());
@@ -171,7 +172,7 @@ public class AMLCommandLine {
 							}
 							List<Character> stack = runtime.getStack().output();
 							System.out.print("Read: " + state.getChar() + ", Now entering state "
-									+ state.getState().getName() + ". Stack: ");
+									+ state.getState().getName() + ". Remaining word:" + state.getWord() + ". Stack: ");
 							for (Character c : stack) {
 								System.out.print(c);
 							}

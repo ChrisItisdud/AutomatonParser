@@ -5,17 +5,20 @@ public class RuntimeResponse<T> {
 	Character readChar;
 	boolean isFinished = false;
 	boolean isWord;
+	String word;
 
-	public RuntimeResponse(T state, Character readChar) {
+	public RuntimeResponse(T state, Character readChar, String word) {
 		this.state = state;
 		this.readChar = readChar;
+		this.word = word;
 	}
 
-	public RuntimeResponse(T state, Character readChar, boolean isFinished, boolean isWord) {
+	public RuntimeResponse(T state, Character readChar, boolean isFinished, boolean isWord, String word) {
 		this.state = state;
 		this.readChar = readChar;
 		this.isFinished = isFinished;
 		this.isWord = isWord;
+		this.word = word;
 	}
 
 	public Character getChar() {
@@ -32,5 +35,9 @@ public class RuntimeResponse<T> {
 
 	public boolean isFinished() {
 		return isFinished;
+	}
+	
+	public String getWord() {
+		return word;
 	}
 }

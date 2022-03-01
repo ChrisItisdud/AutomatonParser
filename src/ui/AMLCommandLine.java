@@ -42,6 +42,8 @@ public class AMLCommandLine {
 						models.RuntimeResponse<models.IState> state = null;
 						do {
 							state = runtime.stepDFA();
+							if (state.isFinished())
+								break;
 							System.out.println("Read: " + state.getChar() + ", Now entering state "
 									+ state.getState().getName() + ". Remaining word: " + state.getWord());
 							scanner.nextLine();
@@ -92,9 +94,11 @@ public class AMLCommandLine {
 								} while (index == -1 || index >= optArr.length);
 								state = runtime.stepNFA(optArr[index]);
 							}
-							System.out.println("Read: " + state.getChar() + ", Now entering state "
-									+ state.getState().getName() + ". Remaining word: " + state.getWord());
-							scanner.nextLine();
+							if (!state.isFinished()) {
+								System.out.println("Read: " + state.getChar() + ", Now entering state "
+										+ state.getState().getName() + ". Remaining word: " + state.getWord());
+								scanner.nextLine();
+							}
 						} while (!state.isFinished());
 						// output result
 						if (!state.isWord() && state.getChar() == null) {
@@ -113,6 +117,8 @@ public class AMLCommandLine {
 						models.RuntimeResponse<models.IPDAState> state = null;
 						do {
 							state = runtime.stepDPDA();
+							if (state.isFinished())
+								break;
 							List<Character> stack = runtime.getStack().output();
 							System.out.print("Read: " + state.getChar() + ", Now entering state "
 									+ state.getState().getName() + ". Remaining word:" + state.getWord() + ". Stack: ");
@@ -170,14 +176,17 @@ public class AMLCommandLine {
 								} while (index == -1 || index >= optArr.length);
 								state = runtime.stepNPDA(optArr[index]);
 							}
-							List<Character> stack = runtime.getStack().output();
-							System.out.print("Read: " + state.getChar() + ", Now entering state "
-									+ state.getState().getName() + ". Remaining word:" + state.getWord() + ". Stack: ");
-							for (Character c : stack) {
-								System.out.print(c);
+							if (!state.isFinished()) {
+								List<Character> stack = runtime.getStack().output();
+								System.out.print("Read: " + state.getChar() + ", Now entering state "
+										+ state.getState().getName() + ". Remaining word:" + state.getWord()
+										+ ". Stack: ");
+								for (Character c : stack) {
+									System.out.print(c);
+								}
+								System.out.println();
+								scanner.nextLine();
 							}
-							System.out.println();
-							scanner.nextLine();
 						} while (!state.isFinished());
 						// output result
 						if (!state.isWord() && state.getChar() == null) {

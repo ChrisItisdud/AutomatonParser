@@ -105,7 +105,7 @@ public class AMLCommandLine {
 							System.out.println("Failure: Word ended on non-final state " + state.getState().getName()
 									+ ". Word is not part of language.");
 						} else if (!state.isWord() && state.getChar() != null) {
-							System.out.println("Failure: State " + state.getState().getName()
+							System.out.println("Failure: State " + (state.getState() == null ? "null" : state.getState().getName())
 									+ " doesn't accept letter " + state.getChar() + ". Word is not part of language.");
 						} else {
 							System.out.println("The given word " + command.substring(6) + " is part of language!");
@@ -133,7 +133,7 @@ public class AMLCommandLine {
 							System.out.println("Failure: Word ended on non-final state " + state.getState().getName()
 									+ ". Word is not part of language.");
 						} else if (!state.isWord() && state.getChar() != null) {
-							System.out.println("Failure: State " + state.getState().getName()
+							System.out.println("Failure: State " + state.getState() == null ? "null" : state.getState().getName()
 									+ " doesn't accept letter " + state.getChar() + ". Word is not part of language.");
 						} else {
 							System.out.println("The given word " + command.substring(6) + " is part of language!");

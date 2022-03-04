@@ -1,5 +1,4 @@
-SECTION INFO	//this is a test for inline comments
-//this is a test for comments on their own line 	
+SECTION INFO	
 name: simple-regex-dfa
 type: DFA
 SECTION STATES
@@ -13,3 +12,4 @@ s1, b, s2
 s2, b, s2
 
 	
+//This automaton parses a simple regular expression a*bb*.

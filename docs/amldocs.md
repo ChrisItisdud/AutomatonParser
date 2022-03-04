@@ -59,7 +59,7 @@ s2, B, b, s2, -	//- will push nothing to the stack
 
 *Note that  at the start of the program, the stack will consist of a single #. You can only read one character from the stack per transition, but are allowed to push multiple characters to the stack, the first letter being the new top of the stack. A NPDA is allowed to end as soon as its stack is empty, while a DPDA is only allowed to end on an end state independently of the stack*
 
-*NOTE: The character '#' has special significance for NFAs and NPDAs, as it will count as a transition that doesn't involve reading a letter. This functionality is deactivated for DFAs and DPDAs as it can lead to non-deterministic behaviour. THIS IS NOT YET IMPLEMENTED.*
+*NOTE: The character '#' has special significance for NFAs and NPDAs, as it will count as a transition that doesn't involve reading a letter. This functionality is deactivated for DFAs and DPDAs as it can lead to non-deterministic behaviour.*
 
 ## Running an AML Program
 

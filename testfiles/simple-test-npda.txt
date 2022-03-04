@@ -8,8 +8,12 @@ end:
 SECTION TRANSITIONS
 s1, #, a, s1, A
 s1, A, a, s1, AA
+s1, A, #, s2, A
+s1, A, #, s3, A
 s1, A, c, s2, A
 s1, A, c, s3, A
 s2, A, b, s2, -
 s3, A, b, s4, A
 s4, A, b, s3, -
+
+//this automaton parses a language L = {a^nc?(b^n|b^2n) | n>0}.

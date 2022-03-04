@@ -14,8 +14,9 @@ public class NPDAState implements IPDAState {
 
 	@Override
 	public PDATransition[] transition(Character input, Character StackValue) {
-		if(!values.containsKey(input)||!values.get(input).containsKey(StackValue)) return null;
-		return values.get(input).get(StackValue);
+		PDATransition[] fromInput = values.containsKey(input) && values.get(input).containsKey(StackValue) ? values.get(input).get(StackValue) : null;
+		PDATransition[] fromEmpty = values.containsKey('#') && values.get('#').containsKey(StackValue) ? values.get('#').get(StackValue) : null;
+		return combineArray(fromInput, fromEmpty);
 	}
 
 	@Override
@@ -49,5 +50,20 @@ public class NPDAState implements IPDAState {
 			values.get(key).put(stackKey, new PDATransition[] {new PDATransition(target, stackTarget)});
 		}
 	}
-
+	
+	private static PDATransition[] combineArray(PDATransition[] arr1, PDATransition[] arr2){
+		if(arr1 == null) return arr2;
+		if(arr2 == null) return arr1;
+		else {
+			PDATransition[] result = new PDATransition[arr1.length +arr2.length];
+			for(int i=0;i<arr1.length;i++) {
+				result[i]=arr1[i];
+			}
+			for(int i=arr1.length;i<result.length;i++) {
+				result[i]=arr2[i-arr1.length];
+			}
+			return result;
+		}
+		
+	}
 }

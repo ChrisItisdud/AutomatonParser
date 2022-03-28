@@ -1,5 +1,9 @@
 package ui;
 
+import compiler.AMLRuntime;
+import models.IPDAState;
+import models.RuntimeResponse;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -67,13 +71,13 @@ public class AMLCommandLine {
 							options = runtime.chooseNFA();
 							models.IState[] optArr = options.getState().getValues();
 							if (options.isFinished()) {
-								state = new models.RuntimeResponse<models.IState>(runtime.getCurr(), '#', true,
+								state = new models.RuntimeResponse<>(runtime.getCurr(), '#', true,
 										options.isWord(), command.substring(6));
 							} else if (optArr == null) { // ==failure
 								state = new models.RuntimeResponse<>(runtime.getCurr(), '#', true, false,
 										command.substring(6));
 							} else if (optArr.length == 1) { // ==deterministic clear path
-								state = runtime.stepNFA(optArr[0]);
+								state = runtime.stepNFA(0);
 							} else { // ==non-deterministic - let user decide
 								System.out.println("Please choose the most appropriate option for the character "
 										+ options.getChar() + " and the remaining word " + options.getWord() + ":");
@@ -82,7 +86,7 @@ public class AMLCommandLine {
 									System.out.println(i + ": " + s.getName());
 									i++;
 								}
-								int index = -1;
+								int index;
 								do {
 									index = -1;
 									try {
@@ -92,7 +96,7 @@ public class AMLCommandLine {
 										System.out.println("Invalid number, please enter valid number!");
 									}
 								} while (index == -1 || index >= optArr.length);
-								state = runtime.stepNFA(optArr[index]);
+								state = runtime.stepNFA(index);
 							}
 							if (!state.isFinished()) {
 								System.out.println("Read: " + state.getChar() + ", Now entering state "
@@ -119,14 +123,7 @@ public class AMLCommandLine {
 							state = runtime.stepDPDA();
 							if (state.isFinished())
 								break;
-							List<Character> stack = runtime.getStack().output();
-							System.out.print("Read: " + state.getChar() + ", Now entering state "
-									+ state.getState().getName() + ". Remaining word:" + state.getWord() + ". Stack: ");
-							for (Character c : stack) {
-								System.out.print(c);
-							}
-							System.out.println();
-							scanner.nextLine();
+							printStack(scanner, runtime, state);
 						} while (!state.isFinished());
 						// output result
 						if (!state.isWord() && state.getChar() == null) {
@@ -155,7 +152,7 @@ public class AMLCommandLine {
 								state = new models.RuntimeResponse<>(runtime.getPdaCurr(), '#', true, false,
 										command.substring(6));
 							} else if (optArr.length == 1) { // ==deterministic clear path
-								state = runtime.stepNPDA(optArr[0]);
+								state = runtime.stepNPDA(0);
 							} else { // ==non-deterministic - let user decide
 								System.out.println("Please choose the most appropriate option for the character "
 										+ options.getChar() + " and the remaining word " + options.getWord() + ":");
@@ -164,7 +161,7 @@ public class AMLCommandLine {
 									System.out.println(i + ": " + s.getName());
 									i++;
 								}
-								int index = -1;
+								int index;
 								do {
 									index = -1;
 									try {
@@ -174,18 +171,10 @@ public class AMLCommandLine {
 										System.out.println("Invalid number, please enter valid number!");
 									}
 								} while (index == -1 || index >= optArr.length);
-								state = runtime.stepNPDA(optArr[index]);
+								state = runtime.stepNPDA(index);
 							}
 							if (!state.isFinished()) {
-								List<Character> stack = runtime.getStack().output();
-								System.out.print("Read: " + state.getChar() + ", Now entering state "
-										+ state.getState().getName() + ". Remaining word:" + state.getWord()
-										+ ". Stack: ");
-								for (Character c : stack) {
-									System.out.print(c);
-								}
-								System.out.println();
-								scanner.nextLine();
+								printStack(scanner, runtime, state);
 							}
 						} while (!state.isFinished());
 						// output result
@@ -204,5 +193,17 @@ public class AMLCommandLine {
 		}
 
 		scanner.close();
+	}
+
+	private static void printStack(Scanner scanner, AMLRuntime runtime, RuntimeResponse<IPDAState> state) {
+		List<Character> stack = runtime.getStack().output();
+		System.out.print("Read: " + state.getChar() + ", Now entering state "
+				+ state.getState().getName() + ". Remaining word:" + state.getWord()
+				+ ". Stack: ");
+		for (Character c : stack) {
+			System.out.print(c);
+		}
+		System.out.println();
+		scanner.nextLine();
 	}
 }

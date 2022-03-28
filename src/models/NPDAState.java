@@ -39,15 +39,15 @@ public class NPDAState implements IPDAState {
 		if(values.containsKey(key)&&values.get(key).containsKey(stackKey)) {
 			PDATransition[] transitions = values.get(key).get(stackKey);
 			PDATransition[] newTransitions = Arrays.copyOf(transitions, transitions.length+1);
-			newTransitions[transitions.length] = new PDATransition(target, stackTarget);
+			newTransitions[transitions.length] = new PDATransition(target, stackTarget, !key.equals('#'));
 			values.get(key).put(stackKey, newTransitions);
 		}
 		else if(!values.containsKey(key)) {
 			values.put(key, new HashMap<>());
-			values.get(key).put(stackKey, new PDATransition[] {new PDATransition(target, stackTarget)});
+			values.get(key).put(stackKey, new PDATransition[] {new PDATransition(target, stackTarget, !key.equals('#'))});
 		}
 		else {
-			values.get(key).put(stackKey, new PDATransition[] {new PDATransition(target, stackTarget)});
+			values.get(key).put(stackKey, new PDATransition[] {new PDATransition(target, stackTarget, !key.equals('#'))});
 		}
 	}
 	

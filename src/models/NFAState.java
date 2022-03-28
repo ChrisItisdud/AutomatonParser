@@ -16,8 +16,12 @@ public class NFAState implements IFAState {
 	@Override
 	public IState[] transition(Character input) {
 		IState[] fromInput = transitions.containsKey(input) ? listToArray(transitions.get(input)) : null;
+		return fromInput;
+	}
+	
+	public IState[] transitionEmpty() {
 		IState[] fromEmpty = transitions.containsKey('#') ? listToArray(transitions.get('#')) : null;
-		return combineArrays(fromInput, fromEmpty);
+		return fromEmpty;
 	}
 	
 	public void addTransition(Character key, IState value, int line) {
@@ -51,16 +55,4 @@ public class NFAState implements IFAState {
 		return result;
 	}
 	
-	private static IState[] combineArrays(IState[] arr1, IState[] arr2) {
-		if(arr1 == null) return arr2;
-		if(arr2 == null) return arr1;
-		IState[] result = new IState[arr1.length+arr2.length];
-		for(int i=0;i<arr1.length;i++) {
-			result[i]=arr1[i];
-		}
-		for(int i=arr1.length;i<result.length;i++) {
-			result[i]=arr2[i-arr1.length];
-		}
-		return result;
-	}
 }

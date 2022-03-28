@@ -12,6 +12,10 @@ public class DFAState implements IState {
 		this.name = name;
 		transitions = new HashMap<>();
 	}
+	
+	public IState[] transitionEmpty() {
+		return null;
+	}
 
 	@Override
 	public IState[] transition(Character input) {

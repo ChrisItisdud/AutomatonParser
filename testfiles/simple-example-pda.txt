@@ -12,4 +12,4 @@ s1, A, b, s2, -
 s2, A, b, s2, -
 s2, #, b, s3, -
 
-//This automaton reads a word that consists of n a, followed b n b (L = {a^nb^n})
+//This automaton reads a word that consists of n a, followed by n b (L = {a^nb^n})

@@ -117,7 +117,7 @@ public class AMLRuntime {
             return new models.RuntimeResponse<>(new models.StateChoice<>(null, null),
                     word.charAt(wordIndex), false, false, word.substring(wordIndex));
         return new models.RuntimeResponse<>(
-                new models.StateChoice<>(getStatesFromTransitions(transitions), null), word.charAt(wordIndex), false, false,
+                new models.StateChoice<>(getStatesFromTransitions(transitions), getReadFromTransitions(transitions)), word.charAt(wordIndex), false, false,
                 word.substring(wordIndex));
     }
 
@@ -181,6 +181,14 @@ public class AMLRuntime {
         models.IPDAState[] state = new models.IPDAState[transitions.length];
         for (int i = 0; i < transitions.length; i++) {
             state[i] = transitions[i].getTarget();
+        }
+        return state;
+    }
+
+    private static boolean[] getReadFromTransitions(models.PDATransition[] transitions) {
+        boolean[] state = new boolean[transitions.length];
+        for (int i = 0; i < transitions.length; i++) {
+            state[i] = transitions[i].isRead();
         }
         return state;
     }

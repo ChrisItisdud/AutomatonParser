@@ -12,4 +12,4 @@ s1, b, s1
 s1, b, s2
 s2, c, s2
 
-//THIS READS A REGULAR EXPRESSION a*b*c*
+//THIS READS A REGULAR EXPRESSION (a*b*)*c*

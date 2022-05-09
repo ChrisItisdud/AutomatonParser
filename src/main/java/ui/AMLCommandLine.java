@@ -13,6 +13,7 @@ public class AMLCommandLine {
 		Scanner scanner = new Scanner(System.in);
 		models.Automaton automaton = null;
 		while (true) {
+			System.out.println("Enter command (parse <FILE>, check <WORD>, quit)");
 			// get command
 			String command = scanner.nextLine();
 			// "quit" command
@@ -83,7 +84,7 @@ public class AMLCommandLine {
 										+ options.getChar() + " and the remaining word " + options.getWord() + ":");
 								int i = 0;
 								for (models.IState s : optArr) {
-									System.out.println(i + ": " + s.getName());
+									System.out.println(i + ": " + s.getName() + (options.getState().getRead()[i] ? ", reading" : ", not reading"));
 									i++;
 								}
 								int index;
@@ -158,7 +159,7 @@ public class AMLCommandLine {
 										+ options.getChar() + " and the remaining word " + options.getWord() + ":");
 								int i = 0;
 								for (models.IPDAState s : optArr) {
-									System.out.println(i + ": " + s.getName());
+									System.out.println(i + ": " + s.getName() + (options.getState().getRead()[i] ? ", reads letter" : ", not reading"));
 									i++;
 								}
 								int index;
